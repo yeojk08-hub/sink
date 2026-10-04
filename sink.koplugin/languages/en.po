@@ -1,0 +1,349 @@
+msgid ""
+msgstr ""
+"Language-Team: English\n"
+"Language: en\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid " [This Device]"
+msgstr " [This Device]"
+
+msgid "%s (Up to date)"
+msgstr "%s (Up to date)"
+
+msgid "%s (Update recommended: %s)"
+msgstr "%s (Update recommended: %s)"
+
+msgid "1. On your phone or computer, open:\n%s\n\n2. Enter this pairing code:\n\n[ %s ]\n\n(Waiting for confirmation...)"
+msgstr "1. On your phone or computer, open:\n%s\n\n2. Enter this pairing code:\n\n[ %s ]\n\n(Waiting for confirmation...)"
+
+msgid "Already synchronized with cloud."
+msgstr "Already synchronized with cloud."
+
+msgid "Authentication failed (401 Unauthorized).\nTap 'Pair Device' to re-link your e-reader."
+msgstr "Authentication failed (401 Unauthorized).\nTap 'Pair Device' to re-link your e-reader."
+
+msgid "Authentication failed (401 Unauthorized).\nYour e-reader's credentials do not match this server.\n\nTap 'Re-Pair Device' to reconnect."
+msgstr "Authentication failed (401 Unauthorized).\nYour e-reader's credentials do not match this server.\n\nTap 'Re-Pair Device' to reconnect."
+
+msgid "Auto-Sync on Read/Close/Sleep"
+msgstr "Auto-Sync on Read/Close/Sleep"
+
+msgid "Backend endpoint not found (404).\nPlease deploy the updated backend to your Cloudflare Worker."
+msgstr "Backend endpoint not found (404).\nPlease deploy the updated backend to your Cloudflare Worker."
+
+msgid "Backend update trigger failed:\n"
+msgstr "Backend update trigger failed:\n"
+
+msgid "Binary (Exact File)"
+msgstr "Binary (Exact File)"
+
+msgid "Binary (Strict byte-for-byte checksum)"
+msgstr "Binary (Strict byte-for-byte checksum)"
+
+msgid "Book removed from cloud library."
+msgstr "Book removed from cloud library."
+
+msgid "Book: %s%s\nProgress: %.1f%%\nLast Device: %s\nLast Sync: %s\n\nRemove this book's progress from cloud server?"
+msgstr "Book: %s%s\nProgress: %.1f%%\nLast Device: %s\nLast Sync: %s\n\nRemove this book's progress from cloud server?"
+
+msgid "Cancel"
+msgstr "Cancel"
+
+msgid "Cannot write temporary update file: "
+msgstr "Cannot write temporary update file: "
+
+msgid "Check for Updates"
+msgstr "Check for Updates"
+
+msgid "Checking connection to Sink server..."
+msgstr "Checking connection to Sink server..."
+
+msgid "Checking for updates..."
+msgstr "Checking for updates..."
+
+msgid "Close"
+msgstr "Close"
+
+msgid "Connecting to Sink server..."
+msgstr "Connecting to Sink server..."
+
+msgid "Connection failed:\n"
+msgstr "Connection failed:\n"
+
+msgid "Could not fetch paired devices:\n"
+msgstr "Could not fetch paired devices:\n"
+
+msgid "Could not fetch synced books:\n"
+msgstr "Could not fetch synced books:\n"
+
+msgid "Could not reach GitHub Releases (HTTP %s)."
+msgstr "Could not reach GitHub Releases (HTTP %s)."
+
+msgid "Could not reach Sink server (%s).\nPlease verify Server URL and Wi-Fi connection."
+msgstr "Could not reach Sink server (%s).\nPlease verify Server URL and Wi-Fi connection."
+
+msgid "Could not trigger automated rebuild:\n\n"
+msgstr "Could not trigger automated rebuild:\n\n"
+
+msgid "Could not update PIN (%s).\nPlease check your connection or backend deployment."
+msgstr "Could not update PIN (%s).\nPlease check your connection or backend deployment."
+
+msgid "Device removed."
+msgstr "Device removed."
+
+msgid "Device unlinked."
+msgstr "Device unlinked."
+
+msgid "Device: %s\nID: %s\nLast Active: %s\n\nRemove this device from your server?"
+msgstr "Device: %s\nID: %s\nLast Active: %s\n\nRemove this device from your server?"
+
+msgid "Dismiss"
+msgstr "Dismiss"
+
+msgid "Download failed (HTTP %s)."
+msgstr "Download failed (HTTP %s)."
+
+msgid "Downloaded archive could not be opened."
+msgstr "Downloaded archive could not be opened."
+
+msgid "Downloaded file is not a valid zip archive."
+msgstr "Downloaded file is not a valid zip archive."
+
+msgid "Downloading Sink %s..."
+msgstr "Downloading Sink %s..."
+
+msgid "Enter a new 4-digit PIN for device pairing:"
+msgstr "Enter a new 4-digit PIN for device pairing:"
+
+msgid "Extraction failed. Please unzip manually."
+msgstr "Extraction failed. Please unzip manually."
+
+msgid "Failed to delete book: "
+msgstr "Failed to delete book: "
+
+msgid "Failed to fetch remote progress:\n"
+msgstr "Failed to fetch remote progress:\n"
+
+msgid "Failed to remove device: "
+msgstr "Failed to remove device: "
+
+msgid "Failed to upload progress:\n"
+msgstr "Failed to upload progress:\n"
+
+msgid "Fetching cloud library..."
+msgstr "Fetching cloud library..."
+
+msgid "Fetching paired devices..."
+msgstr "Fetching paired devices..."
+
+msgid "Filename (Cross-Device)"
+msgstr "Filename (Cross-Device)"
+
+msgid "Filename (Recommended for Phone/Calibre)"
+msgstr "Filename (Recommended for Phone/Calibre)"
+
+msgid "Invalid release response from GitHub."
+msgstr "Invalid release response from GitHub."
+
+msgid "Invalid response from Sink server."
+msgstr "Invalid response from Sink server."
+
+msgid "Later"
+msgstr "Later"
+
+msgid "Local position is current (%.1f%%)."
+msgstr "Local position is current (%.1f%%)."
+
+msgid "Matching Method: %s"
+msgstr "Matching Method: %s"
+
+msgid "No active document found to sync."
+msgstr "No active document found to sync."
+
+msgid "No books currently synced in cloud."
+msgstr "No books currently synced in cloud."
+
+msgid "No paired devices found on server."
+msgstr "No paired devices found on server."
+
+msgid "No remote progress found for this book."
+msgstr "No remote progress found for this book."
+
+msgid "Non-intrusive private KOReader progress synchronization for Kindle and other devices with Cloudflare Workers."
+msgstr "Non-intrusive private KOReader progress synchronization for Kindle and other devices with Cloudflare Workers."
+
+msgid "Not reachable"
+msgstr "Not reachable"
+
+msgid "Or open: %s\nand enter code: [ %s ]\n\n(Waiting for confirmation...)"
+msgstr "Or open: %s\nand enter code: [ %s ]\n\n(Waiting for confirmation...)"
+
+msgid "PIN must be at least 4 digits."
+msgstr "PIN must be at least 4 digits."
+
+msgid "Pair Device (Phone/PC)"
+msgstr "Pair Device (Phone/PC)"
+
+msgid "Pair Device (Sink)"
+msgstr "Pair Device (Sink)"
+
+msgid "Paired Devices"
+msgstr "Paired Devices"
+
+msgid "Pairing module not available."
+msgstr "Pairing module not available."
+
+msgid "Pairing session timed out. Please try again."
+msgstr "Pairing session timed out. Please try again."
+
+msgid "Please configure your Server URL in settings first."
+msgstr "Please configure your Server URL in settings first."
+
+msgid "Please enter a valid Cloudflare Worker URL before pairing."
+msgstr "Please enter a valid Cloudflare Worker URL before pairing."
+
+msgid "Please pair your device or configure credentials in settings."
+msgstr "Please pair your device or configure credentials in settings."
+
+msgid "Please restart KOReader from the top menu."
+msgstr "Please restart KOReader from the top menu."
+
+msgid "Re-Pair Device (Phone/PC)"
+msgstr "Re-Pair Device (Phone/PC)"
+
+msgid "Redirect response missing Location header."
+msgstr "Redirect response missing Location header."
+
+msgid "Remove"
+msgstr "Remove"
+
+msgid "Remove from Cloud"
+msgstr "Remove from Cloud"
+
+msgid "Reset Pairing PIN"
+msgstr "Reset Pairing PIN"
+
+msgid "Restart"
+msgstr "Restart"
+
+msgid "Scan to deploy free Worker:\n%s"
+msgstr "Scan to deploy free Worker:\n%s"
+
+msgid "Scan with your phone to pair instantly:"
+msgstr "Scan with your phone to pair instantly:"
+
+msgid "Server URL"
+msgstr "Server URL"
+
+msgid "Server URL Required"
+msgstr "Server URL Required"
+
+msgid "Server returned HTTP %d:\n%s"
+msgstr "Server returned HTTP %d:\n%s"
+
+msgid "Server: %s"
+msgstr "Server: %s"
+
+msgid "Set Server URL"
+msgstr "Set Server URL"
+
+msgid "Sink"
+msgstr "Sink"
+
+msgid "Sink Plugin: %s\nLatest Available: %s\n\nCloudflare Backend: %s\nTarget Backend: %s\n"
+msgstr "Sink Plugin: %s\nLatest Available: %s\n\nCloudflare Backend: %s\nTarget Backend: %s\n"
+
+msgid "Sink Updates & Version"
+msgstr "Sink Updates & Version"
+
+msgid "Sink: Pair Device"
+msgstr "Sink: Pair Device"
+
+msgid "Sink: Sync Now"
+msgstr "Sink: Sync Now"
+
+msgid "Status: Connected (Tap to test)"
+msgstr "Status: Connected (Tap to test)"
+
+msgid "Status: Not Paired (Tap to pair)"
+msgstr "Status: Not Paired (Tap to pair)"
+
+msgid "Sync Progress Now"
+msgstr "Sync Progress Now"
+
+msgid "Synced Books (Cloud Library)"
+msgstr "Synced Books (Cloud Library)"
+
+msgid "Synced from cloud: %.1f%% (%s)"
+msgstr "Synced from cloud: %.1f%% (%s)"
+
+msgid "Synced to cloud: %.1f%%"
+msgstr "Synced to cloud: %.1f%%"
+
+msgid "Syncing with Sink server..."
+msgstr "Syncing with Sink server..."
+
+msgid "Too many redirects while downloading update."
+msgstr "Too many redirects while downloading update."
+
+msgid "Triggering Cloudflare backend update..."
+msgstr "Triggering Cloudflare backend update..."
+
+msgid "Unknown"
+msgstr "Unknown"
+
+msgid "Unlink Device"
+msgstr "Unlink Device"
+
+msgid "Update Backend"
+msgstr "Update Backend"
+
+msgid "Update Plugin"
+msgstr "Update Plugin"
+
+msgid "Update check error:\n"
+msgstr "Update check error:\n"
+
+msgid "Update check failed:\n"
+msgstr "Update check failed:\n"
+
+msgid "Updater module not available."
+msgstr "Updater module not available."
+
+msgid "Welcome & Setup Guide"
+msgstr "Welcome & Setup Guide"
+
+msgid "Welcome to Sink"
+msgstr "Welcome to Sink"
+
+msgid "Welcome to Sink!\n\nSink gives you private, seamless reading progress synchronization across all your KOReader devices.\n\nSetup requires your own free Cloudflare Worker backend (takes 2 minutes, 100% free forever on Cloudflare's free tier, zero credit card required)."
+msgstr "Welcome to Sink!\n\nSink gives you private, seamless reading progress synchronization across all your KOReader devices.\n\nSetup requires your own free Cloudflare Worker backend (takes 2 minutes, 100% free forever on Cloudflare's free tier, zero credit card required)."
+
+msgid "Your GitHub fork also auto-syncs daily via GitHub Actions."
+msgstr "Your GitHub fork also auto-syncs daily via GitHub Actions."
+
+msgid "current_language"
+msgstr "en"
+
+msgid "✓ Backend update triggered!\n\nCloudflare is rebuilding your Worker in the background (~30-45 seconds)."
+msgstr "✓ Backend update triggered!\n\nCloudflare is rebuilding your Worker in the background (~30-45 seconds)."
+
+msgid "✓ Connected to Sink server!\nSync is active and healthy."
+msgstr "✓ Connected to Sink server!\nSync is active and healthy."
+
+msgid "✓ E-Reader Paired Successfully!\n\nReading progress will now sync automatically."
+msgstr "✓ E-Reader Paired Successfully!\n\nReading progress will now sync automatically."
+
+msgid "✓ Pairing PIN updated successfully!\nYou can now use this PIN when connecting devices."
+msgstr "✓ Pairing PIN updated successfully!\nYou can now use this PIN when connecting devices."
+
+msgid "✓ Plugin is up to date."
+msgstr "✓ Plugin is up to date."
+
+msgid "✓ Sink %s installed successfully!\n\nRestart KOReader now to apply the update?"
+msgstr "✓ Sink %s installed successfully!\n\nRestart KOReader now to apply the update?"
+
+msgid "⬆ Plugin update available!"
+msgstr "⬆ Plugin update available!"
+

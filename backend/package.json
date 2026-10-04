@@ -1,0 +1,33 @@
+{
+  "name": "sink-backend",
+  "version": "1.0.0",
+  "description": "Cloudflare Worker Kosync backend for KOReader reading progress synchronization using Hono and Cloudflare D1",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev",
+    "build": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "d1:init:local": "wrangler d1 execute DB --local --file=./schema.sql",
+    "d1:init:remote": "wrangler d1 execute DB --remote --file=./schema.sql"
+  },
+  "keywords": [
+    "koreader",
+    "kosync",
+    "cloudflare-workers",
+    "hono",
+    "d1",
+    "kindle"
+  ],
+  "author": "",
+  "license": "AGPL-3.0-only",
+  "dependencies": {
+    "hono": "^4.7.4"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250224.0",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.7",
+    "wrangler": "^3.111.0"
+  }
+}

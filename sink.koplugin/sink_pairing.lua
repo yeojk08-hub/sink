@@ -1,0 +1,356 @@
+local UIManager = require("ui/uimanager")
+local InfoMessage = require("ui/widget/infomessage")
+local ButtonDialog = require("ui/widget/buttondialog")
+local Notification = require("ui/widget/notification")
+local NetworkMgr = require("ui/network/manager")
+local Device = require("device")
+local Screen = Device.screen
+local Size = require("ui/size")
+local Font = require("ui/font")
+local VerticalGroup = require("ui/widget/verticalgroup")
+local TextWidget = require("ui/widget/textwidget")
+local VerticalSpan = require("ui/widget/verticalspan")
+local CenterContainer = require("ui/widget/container/centercontainer")
+local json = require("json")
+local socket = require("socket")
+local http = require("socket.http")
+local https = require("ssl.https")
+local ltn12 = require("ltn12")
+local _ = require("gettext")
+local logger = require("logger")
+
+local Blitbuffer = nil
+pcall(function() Blitbuffer = require("ffi/blitbuffer") end)
+local FrameContainer = nil
+pcall(function() FrameContainer = require("ui/widget/container/framecontainer") end)
+local QRWidget = nil
+pcall(function() QRWidget = require("ui/widget/qrwidget") end)
+
+local SinkPairing = {
+    dialog = nil,
+    session_id = nil,
+    poll_token = nil,
+    poll_timer = nil,
+    is_pairing = false,
+    poll_count = 0,
+}
+
+local function cleanUrl(url)
+    if not url then return "" end
+    url = url:match("^%s*(.-)%s*$")
+    if url:sub(-1) == "/" then
+        url = url:sub(1, -2)
+    end
+    return url
+end
+
+local function httpRequest(url, method, headers, request_body, timeout)
+    timeout = timeout or 8
+    local is_https = url:match("^https://") ~= nil
+    local request_fn = is_https and https.request or http.request
+
+    local response_body = {}
+    local req_headers = headers or {}
+    if request_body and #request_body > 0 then
+        req_headers["Content-Length"] = tostring(#request_body)
+    end
+    if not req_headers["User-Agent"] then
+        req_headers["User-Agent"] = "Mozilla/5.0 (compatible; KOReader-Sink/1.0)"
+    end
+
+    local req_table = {
+        url = url,
+        method = method or "GET",
+        headers = req_headers,
+        source = request_body and ltn12.source.string(request_body) or nil,
+        sink = ltn12.sink.table(response_body),
+        timeout = timeout,
+    }
+
+    local ok, code, resp_headers, status
+    local pcall_ok, pcall_err = pcall(function()
+        ok, code, resp_headers, status = request_fn(req_table)
+    end)
+
+    if not pcall_ok then
+        return false, nil, tostring(pcall_err)
+    end
+
+    local resp_text = table.concat(response_body)
+    return ok ~= nil, tonumber(code) or code, resp_text
+end
+
+function SinkPairing:stop()
+    self.is_pairing = false
+    self.session_id = nil
+    self.poll_token = nil
+    if self.poll_timer then
+        UIManager:unschedule(self.poll_timer)
+        self.poll_timer = nil
+    end
+    if self.dialog then
+        UIManager:close(self.dialog)
+        self.dialog = nil
+    end
+end
+
+function SinkPairing:startPairing(sink_plugin, on_complete)
+    self:stop()
+
+    NetworkMgr:runWhenOnline(function()
+        local server_url = cleanUrl(sink_plugin.settings.server_url)
+        if not server_url or server_url == "" then
+            UIManager:show(InfoMessage:new{
+                text = _("Please configure your Server URL in settings first."),
+            })
+            return
+        end
+
+        UIManager:show(Notification:new{ text = _("Connecting to Sink server...") })
+
+        -- 1. Request new pairing session from Worker
+        local create_url = server_url .. "/api/session/create"
+        local ok, code, resp_text = httpRequest(create_url, "POST", { ["Content-Type"] = "application/json" }, "{}", 8)
+
+        if not ok or code ~= 200 or not resp_text then
+            UIManager:show(InfoMessage:new{
+                text = string.format(_("Could not reach Sink server (%s).\nPlease verify Server URL and Wi-Fi connection."), tostring(code or "Network error")),
+            })
+            return
+        end
+
+        local sess_data = nil
+        pcall(function() sess_data = json.decode(resp_text) end)
+        if not sess_data or not sess_data.session_id then
+            UIManager:show(InfoMessage:new{
+                text = _("Invalid response from Sink server."),
+            })
+            return
+        end
+
+        local session_id = sess_data.session_id
+        self.session_id = session_id
+        self.poll_token = sess_data.poll_token
+        self.is_pairing = true
+        self.poll_count = 0
+        logger.info("Sink: started pairing session with code: " .. tostring(session_id))
+
+        self.dialog = self:_buildPairingDialog(server_url, session_id)
+        UIManager:show(self.dialog)
+
+        -- 3. Start Polling Loop
+        self:pollSession(server_url, session_id, sink_plugin, on_complete)
+    end)
+end
+
+function SinkPairing:_buildPairingDialog(server_url, session_id)
+    -- Format code with spaces for crystal clarity on e-ink (e.g. "K 9 X   2 P 4")
+    local raw_code = session_id or ""
+    local formatted_code = string.format("%s %s %s   %s %s %s",
+        raw_code:sub(1,1), raw_code:sub(2,2), raw_code:sub(3,3),
+        raw_code:sub(4,4), raw_code:sub(5,5), raw_code:sub(6,6)
+    )
+
+    -- Build Crash-Safe E-Ink & Touch UI Card with QR Code and Pairing Code
+    local TextBoxWidget = require("ui/widget/textboxwidget")
+    local pair_url = (server_url or "") .. "/?s=" .. (session_id or "")
+
+    local added_widgets = {}
+    local qr_created = false
+
+    if QRWidget and FrameContainer and Blitbuffer then
+        local ok_qr, qr_w = pcall(function()
+            local qr_size = Screen and Screen.scaleBySize and Screen:scaleBySize(170) or 170
+            local qr = QRWidget:new{
+                text = pair_url,
+                width = qr_size,
+                height = qr_size,
+            }
+            if qr and qr.image then
+                local pad = Size and Size.padding and Size.padding.default or 6
+                return FrameContainer:new{
+                    background = Blitbuffer.COLOR_WHITE,
+                    padding = pad,
+                    bordersize = 0,
+                    qr,
+                }
+            end
+            return nil
+        end)
+        if ok_qr and qr_w then
+            table.insert(added_widgets, TextBoxWidget:new{
+                text = _("Scan with your phone to pair instantly:"),
+                face = Font:getFace("infofont"),
+                alignment = "center",
+            })
+            table.insert(added_widgets, VerticalSpan:new{ width = Size and Size.padding and Size.padding.small or 4 })
+            table.insert(added_widgets, qr_w)
+            table.insert(added_widgets, VerticalSpan:new{ width = Size and Size.padding and Size.padding.small or 4 })
+            table.insert(added_widgets, TextBoxWidget:new{
+                text = string.format(
+                    _("Or open: %s\nand enter code: [ %s ]\n\n(Waiting for confirmation...)"),
+                    server_url,
+                    formatted_code
+                ),
+                face = Font:getFace("infofont"),
+                alignment = "center",
+            })
+            qr_created = true
+        end
+    end
+
+    local fallback_text = string.format(
+        _("1. On your phone or computer, open:\n%s\n\n2. Enter this pairing code:\n\n[ %s ]\n\n(Waiting for confirmation...)"),
+        server_url,
+        formatted_code
+    )
+
+    if not qr_created then
+        table.insert(added_widgets, TextBoxWidget:new{
+            text = fallback_text,
+            face = Font:getFace("infofont"),
+            alignment = "center",
+        })
+    end
+
+    local ok_dlg, dlg = pcall(function()
+        return ButtonDialog:new{
+            title = _("Pair Device (Sink)"),
+            title_align = "center",
+            use_info_style = false,
+            _added_widgets = added_widgets,
+            buttons = {
+                {
+                    {
+                        text = _("Cancel"),
+                        id = "close",
+                        callback = function()
+                            self:stop()
+                        end,
+                    },
+                },
+            },
+        }
+    end)
+
+    if ok_dlg and dlg then
+        return dlg
+    else
+        return InfoMessage:new{ text = fallback_text }
+    end
+end
+
+function SinkPairing:pollSession(server_url, session_id, sink_plugin, on_complete)
+    if not self.is_pairing or self.session_id ~= session_id then return end
+
+    self.poll_count = (self.poll_count or 0) + 1
+    if self.poll_count > 150 then -- 5 minutes max
+        self:stop()
+        UIManager:show(InfoMessage:new{
+            text = _("Pairing session timed out. Please try again."),
+        })
+        return
+    end
+
+    local poll_url = server_url .. "/api/session/" .. session_id .. "/poll"
+    local poll_headers = {}
+    if self.poll_token then
+        poll_headers["X-Poll-Token"] = self.poll_token
+        poll_url = poll_url .. "?token=" .. self.poll_token
+    end
+    local poll_ok, poll_code, poll_resp = httpRequest(poll_url, "GET", poll_headers, nil, 4)
+
+    if not self.is_pairing or self.session_id ~= session_id then return end
+
+    if poll_ok and poll_code == 200 and poll_resp and #poll_resp > 0 then
+        local data = nil
+        pcall(function() data = json.decode(poll_resp) end)
+
+        if data and data.status == "ready" and data.username and data.userkey then
+            -- Success! Apply credentials immediately
+            self:stop()
+            logger.info("Sink: paired successfully as user " .. tostring(data.username))
+            sink_plugin.settings.username = data.username
+            sink_plugin.settings.userkey = data.userkey
+            sink_plugin:saveSettings()
+
+            UIManager:show(InfoMessage:new{
+                text = _("✓ E-Reader Paired Successfully!\n\nReading progress will now sync automatically."),
+                timeout = 6,
+            })
+
+            if on_complete then
+                pcall(on_complete)
+            end
+            return
+        end
+    end
+
+    -- Reschedule next poll asynchronously after 1.5 seconds
+    if self.is_pairing and self.session_id == session_id then
+        self.poll_timer = function()
+            self:pollSession(server_url, session_id, sink_plugin, on_complete)
+        end
+        UIManager:scheduleIn(1.5, self.poll_timer)
+    end
+end
+
+function SinkPairing:showResetPinDialog(sink_plugin)
+    local InputDialog = require("ui/widget/inputdialog")
+    local input_dlg
+    input_dlg = InputDialog:new{
+        title = _("Reset Pairing PIN"),
+        description = _("Enter a new 4-digit PIN for device pairing:"),
+        input = "",
+        input_type = "number",
+        save_callback = function(new_pin)
+            new_pin = new_pin and new_pin:match("^%s*(.-)%s*$")
+            if not new_pin or #new_pin < 4 then
+                UIManager:show(InfoMessage:new{
+                    text = _("PIN must be at least 4 digits."),
+                })
+                return
+            end
+
+            NetworkMgr:runWhenOnline(function()
+                local res, err
+                if sink_plugin and sink_plugin._makeRequest then
+                    res, err = sink_plugin:_makeRequest("POST", "/api/session/reset-pin", { new_pin = new_pin })
+                else
+                    local server_url = cleanUrl(sink_plugin.settings.server_url)
+                    local reset_url = server_url .. "/api/session/reset-pin"
+                    local req_headers = {
+                        ["Content-Type"] = "application/json",
+                        ["x-auth-user"] = sink_plugin.settings.username or "",
+                        ["x-auth-key"] = sink_plugin.settings.userkey or "",
+                    }
+                    local req_body = json.encode({ new_pin = new_pin })
+                    local ok, code, resp_text = httpRequest(reset_url, "POST", req_headers, req_body, 8)
+                    res = { status = code, raw = resp_text }
+                end
+
+                if res and res.status == 200 then
+                    UIManager:show(InfoMessage:new{
+                        text = _("✓ Pairing PIN updated successfully!\nYou can now use this PIN when connecting devices."),
+                        timeout = 6,
+                    })
+                elseif res and res.status == 404 then
+                    UIManager:show(InfoMessage:new{
+                        text = _("Backend endpoint not found (404).\nPlease deploy the updated backend to your Cloudflare Worker."),
+                    })
+                else
+                    local err_detail = (res and res.body and res.body.error) or (res and tostring(res.status)) or err or "Error"
+                    UIManager:show(InfoMessage:new{
+                        text = string.format(_("Could not update PIN (%s).\nPlease check your connection or backend deployment."), tostring(err_detail)),
+                    })
+                end
+            end)
+        end,
+    }
+    UIManager:show(input_dlg)
+    if input_dlg.onShowKeyboard then
+        input_dlg:onShowKeyboard()
+    end
+end
+
+return SinkPairing
